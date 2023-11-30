@@ -73,9 +73,9 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.example"
+    namespace "com.goodeva.hub"
     defaultConfig {
-        applicationId "com.example"
+        applicationId "com.goodeva.hub"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
