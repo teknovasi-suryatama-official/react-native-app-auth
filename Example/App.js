@@ -1,5 +1,5 @@
 import React, {useState, useCallback, useMemo} from 'react';
-import {Alert} from 'react-native';
+import {Alert, Text, View} from 'react-native';
 import {
   authorize,
   refresh,
@@ -15,6 +15,7 @@ import {
   FormValue,
   Heading,
 } from './components';
+import moment from "moment";
 
 const configs = {
   identityserver: {
@@ -31,18 +32,30 @@ const configs = {
     // }
   },
   auth0: {
-    // From https://openidconnect.net/
-    issuer: 'https://samples.auth0.com',
-    clientId: 'kbyuFDidLLm280LIwVFiazOqjO3ty8KH',
-    redirectUrl: 'https://openidconnect.net/callback',
-    additionalParameters: {},
-    scopes: ['openid', 'profile', 'email', 'phone', 'address'],
+    issuer: 'https://accounts.fitbit.com/login',
 
-    // serviceConfiguration: {
-    //   authorizationEndpoint: 'https://samples.auth0.com/authorize',
-    //   tokenEndpoint: 'https://samples.auth0.com/oauth/token',
-    //   revocationEndpoint: 'https://samples.auth0.com/oauth/revoke'
-    // }
+    clientId: '23RFP5',
+    clientSecret: '3c72a622ee8c73cc24caa063fdf3567f',
+    redirectUrl: 'com.goodeva.hub://oauthredirect',
+    scopes: [
+      'activity',
+      'heartrate',
+      'location',
+      'nutrition',
+      'oxygen_saturation',
+      'profile',
+      'respiratory_rate',
+      'settings',
+      'sleep',
+      'social',
+      'temperature',
+      'weight',
+    ],
+    serviceConfiguration: {
+      authorizationEndpoint: 'https://www.fitbit.com/oauth2/authorize',
+      tokenEndpoint: 'https://api.fitbit.com/oauth2/token',
+      revocationEndpoint: 'https://api.fitbit.com/oauth2/revoke',
+    },
   },
 };
 
@@ -129,45 +142,44 @@ const App = () => {
     return false;
   }, [authState]);
 
+  const generateDate = (dateGet) => {
+    return moment(dateGet).utc().format('dddd, DD MMMM YYYY HH:mm:ss') + ' WIB';
+  };
+
   return (
     <Page>
       {authState.accessToken ? (
-        <Form>
-          <FormLabel>accessToken</FormLabel>
+        <Form style={{ margin: 10 }}>
+          <FormLabel>Access Token :</FormLabel>
           <FormValue>{authState.accessToken}</FormValue>
-          <FormLabel>accessTokenExpirationDate</FormLabel>
-          <FormValue>{authState.accessTokenExpirationDate}</FormValue>
-          <FormLabel>refreshToken</FormLabel>
+          <FormLabel>Access Token Expired at :</FormLabel>
+          <FormValue>
+            {generateDate(authState.accessTokenExpirationDate)}
+          </FormValue>
+          <FormLabel>Refresh Token</FormLabel>
           <FormValue>{authState.refreshToken}</FormValue>
-          <FormLabel>scopes</FormLabel>
-          <FormValue>{authState.scopes.join(', ')}</FormValue>
         </Form>
       ) : (
-        <Heading>
-          {authState.hasLoggedInOnce ? 'Goodbye.' : 'Hello, stranger.'}
-        </Heading>
+        <Text
+          style={{ marginLeft: 10, marginRight: 10, marginTop: 10, color: '#000' }}
+        >
+          Good bye!
+        </Text>
       )}
 
       <ButtonContainer>
         {!authState.accessToken ? (
-          <>
-            <Button
-              onPress={() => handleAuthorize('identityserver')}
-              text="Authorize IdentityServer"
-              color="#DA2536"
-            />
-            <Button
-              onPress={() => handleAuthorize('auth0')}
-              text="Authorize Auth0"
-              color="#DA2536"
-            />
-          </>
+          <Button
+            onPress={() => handleAuthorize('auth0')}
+            text="Sign in"
+            color="#0349fc"
+          />
         ) : null}
         {authState.refreshToken ? (
-          <Button onPress={handleRefresh} text="Refresh" color="#24C2CB" />
+          <Button onPress={handleRefresh} text="Refresh Token" color="#24C2CB" />
         ) : null}
         {showRevoke ? (
-          <Button onPress={handleRevoke} text="Revoke" color="#EF525B" />
+          <Button onPress={handleRevoke} text="Sign out" color="#EF525B" />
         ) : null}
       </ButtonContainer>
     </Page>
