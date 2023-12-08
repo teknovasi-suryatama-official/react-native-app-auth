@@ -1,5 +1,17 @@
-import React, {useState, useCallback, useMemo} from 'react';
-import {Alert, Image, Pressable, ScrollView, Text, View} from 'react-native';
+import React, {
+  useState, 
+  useCallback, 
+  useMemo,
+  useEffect
+} from 'react';
+import {
+  Alert, 
+  Image, 
+  Pressable, 
+  ScrollView, 
+  Text, 
+  View
+} from 'react-native';
 import {
   authorize,
   refresh,
@@ -10,12 +22,7 @@ import {
   Page,
   Button,
   ButtonContainer,
-  Form,
-  FormLabel,
-  FormValue,
-  Heading,
 } from './components';
-import moment from "moment";
 
 import logoPamaKecil from './assets/logo_pama_kecil.png';
 import logoOpa from './assets/logo_opa_dashboard_hijau.png';
@@ -24,6 +31,7 @@ import sleep_moon from './assets/sleep.png';
 import warning from './assets/warning.png';
 import heart_rate from './assets/heart_rate.png';
 import pama_transparan_logo from './assets/pama_transparan.png';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const configs = {
   identityserver: {
@@ -67,16 +75,26 @@ const configs = {
   },
 };
 
-const defaultAuthState = {
-  hasLoggedInOnce: false,
-  provider: '',
-  accessToken: '',
-  accessTokenExpirationDate: '',
-  refreshToken: '',
-};
-
 const App = () => {
-  const [authState, setAuthState] = useState(defaultAuthState);
+  const defaultAuthState = {
+    hasLoggedInOnce: false,
+    provider: '',
+    accessToken: '',
+    accessTokenExpirationDate: '',
+    refreshToken: '',
+  };
+  
+  const existAuthState = {
+    hasLoggedInOnce: authState?.hasLoggedInOnce,
+    provider: authState?.provider,
+    accessToken: authState?.accessToken,
+    accessTokenExpirationDate: authState?.accessTokenExpirationDate,
+    refreshToken: authState?.refreshToken,
+  };
+
+  const [authState, setAuthState] = useState(logingInfo === '1' ? existAuthState : defaultAuthState);
+  const [logingInfo, setLogingInfo] = useState();
+
   React.useEffect(() => {
     prefetchConfiguration({
       warmAndPrefetchChrome: true,
@@ -99,6 +117,9 @@ const App = () => {
         provider: provider,
         ...newAuthState,
       });
+
+      AsyncStorage.setItem('LOGING', '1');
+      setLogingInfo('1');
     } catch (error) {
       Alert.alert('Failed to log in', error.message);
     }
@@ -140,6 +161,17 @@ const App = () => {
     }
   }, [authState]);
 
+  const logOutProses = async () => {
+    const infoLoging = await AsyncStorage.getItem('LOGING');
+    console.info('cekloging: ', infoLoging);
+  };
+
+  const setLoging = async () => {
+    const infoLoging = await AsyncStorage.getItem('LOGING');
+    console.info('cekloging: ', infoLoging);
+    setLogingInfo(infoLoging);
+  }
+
   const showRevoke = useMemo(() => {
     if (authState.accessToken) {
       const config = configs[authState.provider];
@@ -150,12 +182,17 @@ const App = () => {
     return false;
   }, [authState]);
 
+  useEffect(() => {
+    setLoging();
+  }, []);
+
   return (
     <Page>
+      {console.info('cekauthstate: ', authState)}
       {authState.accessToken ? (
         <View>
           <View>
-            {console.info('cekauthkey: ', authState.accessToken)}
+            {console.info(JSON.stringify(authState, null, ' '))}
             <ScrollView>
                 {/* SECTION #1: Logo & Versi */}
                 <View
@@ -193,7 +230,7 @@ const App = () => {
                     <View
                       style={{ backgroundColor: '#f4ff26', height: 24, borderRadius: 4 }}
                     >
-                      <Text style={{ color: '#253C7F', marginTop: 1, paddingLeft: 10, paddingRight: 10, fontWeight: 'bold' }}>v1.0</Text>
+                      <Text style={{ color: '#253C7F', marginTop: 2.5, paddingLeft: 10, paddingRight: 10, fontWeight: 'bold' }}>v1.0</Text>
                     </View>
                   </View>
                 </View>
@@ -218,7 +255,7 @@ const App = () => {
 
                 {/* SECTION #3: Card Total Tidur hari ini */}
                 <View
-                  style={{ backgroundColor: '#fff', shadowColor: '#000', marginLeft: 13, marginTop: 30, marginRight: 13, borderRadius: 5, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, elevation: 4, }}
+                  style={{ backgroundColor: '#fff', shadowColor: '#000', marginLeft: 13, marginTop: 30, marginRight: 13, borderRadius: 5, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.2, elevation: 1, }}
                 >
                   <View style={{ padding: 10, paddingBottom: 0 }}>
                     <View
@@ -295,7 +332,7 @@ const App = () => {
                 
                 {/* SECTION #3: Card Total Tidur Kemarin */}
                 <View
-                  style={{ backgroundColor: '#fff', shadowColor: '#000', marginLeft: 13, marginTop: 15, marginRight: 13, borderRadius: 5, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, elevation: 4, }}
+                  style={{ backgroundColor: '#fff', shadowColor: '#000', marginLeft: 13, marginTop: 15, marginRight: 13, borderRadius: 5, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.2, elevation: 1,  }}
                 >
                   <View style={{ padding: 10, paddingBottom: 0 }}>
                     <View
@@ -371,7 +408,7 @@ const App = () => {
                 </View>
                 
                 {/* SECTION #3: Waktu Terjaga */}
-                <View
+                {/* <View
                   style={{ backgroundColor: '#fff', shadowColor: '#000', marginLeft: 13, marginTop: 15, marginRight: 13, borderRadius: 5, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, elevation: 4, }}
                 >
                   <View style={{ padding: 10, paddingBottom: 0 }}>
@@ -416,11 +453,11 @@ const App = () => {
                       />
                     </View>
                   </View>
-                </View>
+                </View> */}
                 
                 {/* SECTION #3: Heart Rate */}
                 <View
-                  style={{ backgroundColor: '#fff', shadowColor: '#000', marginLeft: 13, marginTop: 15, marginRight: 13, borderRadius: 5, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, elevation: 4 }}
+                  style={{ backgroundColor: '#fff', shadowColor: '#000', marginLeft: 13, marginTop: 15, marginRight: 13, borderRadius: 5, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.2, elevation: 1,  }}
                 >
                   <View style={{ padding: 10, paddingBottom: 0 }}>
                     <View
@@ -460,8 +497,8 @@ const App = () => {
                     <View
                       style={{ flex: 1, justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginLeft: 50, marginTop: -15}}
                     >
-                      <Text style={{ fontWeight: 'bold', fontSize: 50, color: '#ed114f' }}>77</Text>
-                      <Text style={{ fontWeight: 'bold', color: '#ed114f' }}>bpm</Text>
+                      <Text style={{ fontWeight: 'bold', fontSize: 50, color: '#ed114f' }}>103</Text>
+                      <Text style={{ fontWeight: 'bold', color: '#ed114f', marginTop: 20, marginLeft: 5 }}>bpm</Text>
                     </View>
                     <View
                       style={{ flex: 1, justifyContent: 'center', alignItems: 'flex-end' }}
@@ -475,7 +512,7 @@ const App = () => {
                 </View>
 
                 {/* SECTION: Tombol Cuti */}
-                <View
+                {/* <View
                   style={{ backgroundColor: '#e843e8', shadowColor: '#000', marginLeft: 13, marginTop: 15, marginRight: 13, borderRadius: 5, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, elevation: 4, paddingBottom: 13 }}
                 >
                   <View style={{ padding: 10, paddingBottom: 0 }}>
@@ -485,10 +522,10 @@ const App = () => {
                       <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16, flex: 1 }}>Absen Cuti</Text>
                     </View>
                   </View>
-                </View>
+                </View> */}
 
                 {/* SECTION: Tombol Absen Ulang */}
-                <View
+                {/* <View
                   style={{ backgroundColor: '#6e3dff', shadowColor: '#000', marginLeft: 13, marginTop: 10, marginRight: 13, borderRadius: 5, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, elevation: 4, paddingBottom: 13 }}
                 >
                   <View style={{ padding: 10, paddingBottom: 0 }}>
@@ -498,20 +535,24 @@ const App = () => {
                       <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16, flex: 1 }}>Absen Ulang</Text>
                     </View>
                   </View>
-                </View>
+                </View> */}
 
                 {/* SECTION: Sign out */}
-                <View
-                  style={{ backgroundColor: '#ff3d4a', shadowColor: '#000', marginLeft: 13, marginTop: 10, marginRight: 13, borderRadius: 5, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, elevation: 4, paddingBottom: 13 }}
+                <Pressable
+                  onPress={logOutProses}
                 >
-                  <View style={{ padding: 10, paddingBottom: 0 }}>
-                    <View
-                      style={{ flexDirection: 'row' }}
-                    >
-                      <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16, flex: 1 }}>Sign Out</Text>
+                  <View
+                    style={{ backgroundColor: '#ff3d4a', shadowColor: '#000', marginLeft: 13, marginTop: 15, marginRight: 13, borderRadius: 5, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.2, elevation: 1, paddingBottom: 13 }}
+                  >
+                    <View style={{ padding: 10, paddingBottom: 0 }}>
+                      <View
+                        style={{ flexDirection: 'row' }}
+                      >
+                        <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16, flex: 1, alignItems: 'center' }}>Revoke Access</Text>
+                      </View>
                     </View>
                   </View>
-                </View>
+                </Pressable>
 
                 {/* SECTION: Logo Pama Transparant Paling Bawah */}
                 <View
