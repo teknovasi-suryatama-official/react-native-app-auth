@@ -3,7 +3,8 @@ import {
   StyleSheet, 
   Text, 
   TouchableOpacity, 
-  View 
+  View,
+  Image
 } from 'react-native';
 import React, { 
   useCallback,
@@ -14,6 +15,9 @@ import {
 } from 'react-native-app-auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+import goodeva from '../../assets/goodeva.png';
+import spo2 from '../../assets/spo2.png';
 
 const configs = {
   auth0: {
@@ -82,14 +86,41 @@ const Login = ({navigation}) => {
   const showContentHasNoAccess = () => {
     return (
       <>
-        <SafeAreaView>
-          <View style={{ padding: 15, backgroundColor: 'white', height: '100%' }}>
+        <SafeAreaView
+          style={{ backgroundColor: 'white', height: 900, justifyContent: 'top', }}
+        >
+          <View style={{ paddingLeft: 15, backgroundColor: 'white', paddingRight: 15, marginTop: 20 }}>
+            <Text style={{ textAlign: 'center', marginBottom: -5, fontWeight: 'bold', fontSize: 30 }}>
+              Goodeva Technology
+            </Text>
+            <Text
+              style={{ textAlign: 'center', marginBottom: 150, fontSize: 15 }}
+            >
+              Deliver more than requirement
+            </Text>
+
+            <View style={{ alignItems: 'center', marginBottom: 150 }}>
+              <Image
+                  source={goodeva}
+                  style={{width: 100, height: 100}}
+                />
+            </View>
             <TouchableOpacity
-              style={[styles.buttonPrimary, { flex: 1, backgroundColor: '#042a69' }]} 
+              style={[styles.buttonPrimary, { backgroundColor: '#fc0349' }]} 
               onPress={actionOAuth}
             >
-              <Text style={styles.textButtonLight}>Sign In</Text>
+              <Text style={styles.textButtonLight}>Signin with Google</Text>
             </TouchableOpacity>
+            <Text
+              style={{ textAlign: 'center', marginBottom: 0, fontSize: 15, marginTop: 210, color: '#968388' }}
+            >
+             PT. Goodeva Merdeka Teknologi
+            </Text>
+            <Text
+              style={{ textAlign: 'center', marginBottom: 0, fontSize: 10, marginTop: 5, color: '#b5aeb0' }}
+            >
+             Powered by FitBit
+            </Text>
           </View>
         </SafeAreaView>
       </>
