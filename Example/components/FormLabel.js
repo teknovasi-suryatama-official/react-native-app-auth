@@ -9,6 +9,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     backgroundColor: 'transparent',
     marginBottom: 10,
+    color: '#000',
   },
 });
 

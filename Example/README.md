@@ -1,40 +1,27 @@
-# React Native App Auth Example
+# React Native App Auth Goodeva Hub
+Sebelum menjalankan project, lebih baik kita setup terlebih dahulu project dengan beberapa tahapan sebagai berikut
 
-![Demo](demo.gif)
-
-## Running the iOS app
-
-After cloning the repository, run the following:
+## Step #1: First configure
 
 ```sh
-cd react-native-app-auth/Example
-yarn
-(cd ios && pod install)
-npx react-native run-ios
+$ yarn add react-native-app-auth
 ```
 
-## Running the Android app
-
-After cloning the repository, run the following:
+Untuk memastikan jalankan command berikut juga
 
 ```sh
-cd react-native-app-auth/Example
-yarn
-npx react-native run-android
+$ npm install react-native-app-auth --save
 ```
 
-### Notes
-* You have to have the emulator open before running the last command. If you have difficulty getting the emulator to connect, open the project from Android Studio and run it through there.
-* ANDROID: When integrating with a project that utilizes deep linking (e.g. [React Navigation deep linking](https://reactnavigation.org/docs/deep-linking/#set-up-with-bare-react-native-projects)), update the redirectUrl in your config and the `appAuthRedirectScheme` value in build.gradle to use a custom scheme so that it differs from the scheme used in your deep linking intent-filter [as seen here](https://github.com/FormidableLabs/react-native-app-auth/issues/494#issuecomment-797394994).
+## Step #2: Repackage project
+Sebelumnya harus install paket manager
 
-Example:
+```sh
+$ npm i react-native-rename
 ```
-// build.gradle
-android {
-  defaultConfig {
-    manifestPlaceholders = [
-      appAuthRedirectScheme: 'io.identityserver.demo.auth'
-    ]
-  }
-}
+
+Lalu kemudian buat rename package seperti berikult
+
+```sh
+$ npx react-native-rename@latest "new_name" -b "bundle_identifier"
 ```

@@ -1,13 +1,10 @@
 import React from 'react';
-import { ImageBackground, StyleSheet, SafeAreaView } from 'react-native';
+import { ImageBackground, StyleSheet, SafeAreaView, Text, View } from 'react-native';
 
 const Page = ({ children }) => (
-  <ImageBackground
-    source={require('../assets/background.jpg')}
-    style={[styles.background, { width: '100%', height: '100%' }]}
-  >
-    <SafeAreaView style={styles.safe}>{children}</SafeAreaView>
-  </ImageBackground>
+  <View>
+    <SafeAreaView>{children}</SafeAreaView>
+  </View>
 );
 
 const styles = StyleSheet.create({
@@ -18,9 +15,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingBottom: 10,
   },
-  safe: {
-    flex: 1,
-  }
 });
 
 export default Page;

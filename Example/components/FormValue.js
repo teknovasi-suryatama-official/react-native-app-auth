@@ -15,6 +15,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     backgroundColor: 'transparent',
     marginBottom: 20,
+    color: '#83878f'
   }
 });
 
