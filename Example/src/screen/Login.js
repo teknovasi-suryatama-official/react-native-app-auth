@@ -1,0 +1,140 @@
+import {
+  ScrollView, 
+  StyleSheet, 
+  Text, 
+  TouchableOpacity, 
+  View 
+} from 'react-native';
+import React, { 
+  useCallback,
+} from 'react';
+import {
+  authorize,
+  prefetchConfiguration,
+} from 'react-native-app-auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+const configs = {
+  auth0: {
+    issuer: 'https://accounts.fitbit.com/login',
+
+    clientId: '23RFP5',
+    clientSecret: '3c72a622ee8c73cc24caa063fdf3567f',
+    redirectUrl: 'com.goodeva.hub://oauthredirect',
+    scopes: [
+      'activity',
+      'heartrate',
+      'location',
+      'nutrition',
+      'oxygen_saturation',
+      'profile',
+      'respiratory_rate',
+      'settings',
+      'sleep',
+      'social',
+      'temperature',
+      'weight',
+    ],
+    serviceConfiguration: {
+      authorizationEndpoint: 'https://www.fitbit.com/oauth2/authorize',
+      tokenEndpoint: 'https://api.fitbit.com/oauth2/token',
+      revocationEndpoint: 'https://api.fitbit.com/oauth2/revoke',
+    },
+  },
+};
+
+const Login = ({navigation}) => {
+
+  React.useEffect(() => {
+    prefetchConfiguration({
+      warmAndPrefetchChrome: true,
+      connectionTimeoutSeconds: 5,
+      ...configs.auth0,
+    });
+  }, []);
+
+  const handleAuthorize = useCallback(async provider => {
+    try {
+      const config = configs[provider];
+      const newAuthState = await authorize({
+        ...config,
+        connectionTimeoutSeconds: 5,
+        iosPrefersEphemeralSession: true,
+      });
+
+      try {
+        const jsonValue = JSON.stringify(newAuthState);
+        await AsyncStorage.setItem('LOGING-FITBIT', jsonValue);
+        navigation.navigate('Home');
+      } catch (e) {
+        console.log('AUTORIZE-SAFE-RESPONSE-CATCH: ', e.message);
+      }
+    } catch (error) {
+      console.info('AUTORIZE ERROR: ', error.message);
+    }
+  }, []);
+
+  const actionOAuth = () => {
+    handleAuthorize('auth0');
+  };
+
+  const showContentHasNoAccess = () => {
+    return (
+      <>
+        <SafeAreaView>
+          <View style={{ padding: 15, backgroundColor: 'white', height: '100%' }}>
+            <TouchableOpacity
+              style={[styles.buttonPrimary, { flex: 1, backgroundColor: '#042a69' }]} 
+              onPress={actionOAuth}
+            >
+              <Text style={styles.textButtonLight}>Sign In</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </>
+    )
+  };
+
+  return (
+    <ScrollView>
+      <View style={styles.container}>
+        {showContentHasNoAccess()}
+      </View>
+    </ScrollView>
+  )
+};
+
+const styles = StyleSheet.create({
+    container: {
+      padding: 0,
+      backgroundColor: '#f2eded'
+    },
+    textInputBasic: {
+      height: 40, 
+      fontWeight: 'bold',
+      borderWidth: 1.5, 
+      marginBottom: 10, 
+      paddingLeft: 20, 
+      paddingRight: 20,
+      borderRadius: 5,
+      borderColor: '#c0c6cf',
+      color: 'black',
+    },
+    buttonPrimary: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 12,
+      paddingHorizontal: 32,
+      borderRadius: 4,
+    },
+    textButtonLight: {
+      fontSize: 16,
+      lineHeight: 21,
+      fontWeight: 'bold',
+      letterSpacing: 0.25,
+      color: 'white',
+    },
+  });
+
+export default Login;
