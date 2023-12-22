@@ -50,6 +50,7 @@ const configs = {
 
 const Login = ({navigation}) => {
 
+  // 01 - HANDLE AUTHORIZE TO GET TOKEN ACCESS ---------------------||>
   React.useEffect(() => {
     prefetchConfiguration({
       warmAndPrefetchChrome: true,
@@ -90,11 +91,11 @@ const Login = ({navigation}) => {
           style={{ backgroundColor: 'white', height: 900, justifyContent: 'top', }}
         >
           <View style={{ paddingLeft: 15, backgroundColor: 'white', paddingRight: 15, marginTop: 20 }}>
-            <Text style={{ textAlign: 'center', marginBottom: -5, fontWeight: 'bold', fontSize: 30 }}>
+            <Text style={{ textAlign: 'center', marginBottom: -5, fontWeight: 'bold', fontSize: 30, color: '#000' }}>
               Goodeva Technology
             </Text>
             <Text
-              style={{ textAlign: 'center', marginBottom: 150, fontSize: 15 }}
+              style={{ textAlign: 'center', marginBottom: 150, fontSize: 15, color: '#6a736c' }}
             >
               Deliver more than requirement
             </Text>

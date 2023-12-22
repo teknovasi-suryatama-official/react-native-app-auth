@@ -2,14 +2,15 @@ import { Alert, Dimensions, Image, Pressable, ScrollView, StyleSheet, Text, View
 import React, { useCallback, useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  LineChart,
-  BarChart,
-  PieChart,
-  ProgressChart,
-  ContributionGraph,
-  StackedBarChart
-} from "react-native-chart-kit";
+// import {
+//   LineChart,
+//   BarChart,
+//   PieChart,
+//   ProgressChart,
+//   ContributionGraph,
+//   StackedBarChart
+// } from "react-native-chart-kit";
+import { BarChart, Grid, XAxis, YAxis } from 'react-native-svg-charts';
 import moment from 'moment';
 
 import {
@@ -107,7 +108,7 @@ const Home = ({navigation}) => {
       type: ''
     });
 
-    await AsyncStorage.removeItem('LOGING-FITBIT')
+    await AsyncStorage.clear();
     navigation.navigate('Splash');
   };
 
@@ -190,7 +191,6 @@ const Home = ({navigation}) => {
         if (parseToJSONSPo2 === null) {
           getDataSPo2(parseToJSON?.tokenAdditionalParameters?.user_id, parseToJSON?.accessToken, moment().format('yyyy-MM-DD'));
         } else {
-          console.log(JSON.stringify(parseToJSONSPo2?.value, null, ' '));
           setDtSPo2({
             ...getDtSPo2,
             avgSPo: parseToJSONSPo2?.value?.avg,
@@ -200,6 +200,7 @@ const Home = ({navigation}) => {
         }
       } else if (checkReadyDataSleepTd !== '[]') {
         console.log('2.2. DATA SLEEP HARI INI TIDAK TERSEDIA');
+        getDataSleepToday(form?.tokenAdditionalParameters, form?.accessToken, todayDate);
       } else {
         console.log('PENYIAPAN DATA SLEEP HARI INI...');
         getDataSleepToday(form?.tokenAdditionalParameters, form?.accessToken, todayDate);
@@ -271,6 +272,7 @@ const Home = ({navigation}) => {
             try {
               const jsonValue = JSON.stringify(json);
               await AsyncStorage.setItem('DATA_DEVICE_STR', jsonValue);
+              console.info(JSON.stringify(json, null,  ' '));
             } catch (e) {
               console.log('AUTORIZE-SAFE-RESPONSE-CATCH-TD: ', e.message);
             }
@@ -377,10 +379,547 @@ const Home = ({navigation}) => {
     }
   };
 
-  useEffect(() => {
-    loadAuthorize()
-  }, []);
+  const minValue = 80;
 
+  function* yLabel() {
+    yield * ['', 'DEEP', 'LIGHT', 'REM', 'AWAKE'];
+  }
+
+  const yLabelIterator = yLabel();
+
+  const data = { 
+      labels: ["23:00", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "05:20"],
+      datasets: [
+          {
+              data: [50, 40, 40, 30, 30, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 10, 10, 10, 10],
+              colors: [
+                  () => `#fc6f3d`,
+                  () => `#fc6f3d`,
+                  () => `#fc6f3d`,
+                  () => `#e30763`,
+                  () => `#e30763`,
+                  () => `#7773ff`,
+                  () => `#7773ff`,
+                  () => `#7773ff`,
+                  () => `#7773ff`,
+                  () => `#7773ff`,
+                  () => `#7773ff`,
+                  () => `#7773ff`,
+                  () => `#7773ff`,
+                  () => `#7773ff`,
+                  () => `#7773ff`,
+                  () => `#7773ff`,
+                  () => `#23204f`,
+                  () => `#23204f`,
+                  () => `#23204f`,
+                  () => `#23204f`,
+              ]
+          } 
+      ]
+  }; 
+
+  const fill = 'rgb(134, 65, 244)'
+  const dataNewBar = [30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 20, 20, 20, 20, 20, 20, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 10, 10, 10, 10, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30]
+ 
+  // AWAKE DATA
+  var awakeData1 = [
+    {
+        value: 3,
+        svg: {
+            fill: '#e73360',
+        },
+    },
+  ];
+  var awakeData2 = [
+    {
+        value: 3,
+        svg: {
+            fill: '#e73360',
+        },
+    },
+    {
+        value: 3,
+        svg: {
+            fill: '#e73360',
+        },
+    },
+  ];
+
+  // REM DATA
+  var remData = [
+    {
+        value: 20,
+        svg: {
+            fill: '#7ec4ff',
+        },
+    },
+    {
+        value: 20,
+        svg: {
+            fill: '#7ec4ff',
+        },
+    },
+  ];
+
+  // LIGHT DATA
+  var lightData1 = [
+    {
+        value: 2,
+        svg: {
+            fill: '#3f8dff',
+        },
+    },
+    {
+        value: 2,
+        svg: {
+            fill: '#3f8dff',
+        },
+    },
+    {
+        value: 2,
+        svg: {
+            fill: '#3f8dff',
+        },
+    },
+  ];
+  var lightData2 = [
+    {
+        value: 2,
+        svg: {
+            fill: '#3f8dff',
+        },
+    },
+  ];
+  var lightData3 = [
+    {
+        value: 2,
+        svg: {
+            fill: '#3f8dff',
+        },
+    },
+    {
+        value: 2,
+        svg: {
+            fill: '#3f8dff',
+        },
+    },
+    {
+        value: 2,
+        svg: {
+            fill: '#3f8dff',
+        },
+    },
+  ];
+  var lightData4 = [
+    {
+        value: 2,
+        svg: {
+            fill: '#3f8dff',
+        },
+    },
+  ];
+  var lightData5 = [
+    {
+        value: 2,
+        svg: {
+            fill: '#3f8dff',
+        },
+    },
+  ];
+
+  // DEEP DATA
+  var deepData1 = [
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+  ];
+  var deepData2 = [
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 3,
+        svg: {
+            fill: '#e73360',
+        },
+    },
+    {
+        value: 3,
+        svg: {
+            fill: '#e73360',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 3,
+        svg: {
+            fill: '#e73360',
+        },
+    },
+    {
+        value: 3,
+        svg: {
+            fill: '#e73360',
+        },
+    },
+    {
+        value: 3,
+        svg: {
+            fill: '#e73360',
+        },
+    },
+    {
+        value: 3,
+        svg: {
+            fill: '#e73360',
+        },
+    },
+    {
+        value: 3,
+        svg: {
+            fill: '#e73360',
+        },
+    },
+    {
+        value: 3,
+        svg: {
+            fill: '#e73360',
+        },
+    },
+    {
+        value: 3,
+        svg: {
+            fill: '#e73360',
+        },
+    },
+    {
+        value: 3,
+        svg: {
+            fill: '#e73360',
+        },
+    },
+    {
+        value: 3,
+        svg: {
+            fill: '#e73360',
+        },
+    },
+    {
+        value: 3,
+        svg: {
+            fill: '#e73360',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+  ];
+
+  var deepData3 = [
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+  ];
+
+  var deepData4 = [
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+  ];
+
+  var deepData5 = [
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+    {
+        value: 1,
+        svg: {
+            fill: '#154ba6',
+        },
+    },
+  ];
+
+  const dataNewBar2 = [].concat(awakeData1, lightData1, deepData1, lightData2, deepData2, lightData3, deepData3, lightData4, deepData4, lightData5, deepData5, awakeData2);
+
+  const chartConfig = {
+    backgroundColor: "#e26a00",
+    backgroundGradientFrom: "#fb8c00",
+    backgroundGradientTo: "#ffa726",
+    decimalPlaces: 2, // optional, defaults to 2dp
+    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+    labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+    style: {
+      borderRadius: 0,
+    },
+    propsForDots: {
+      r: "6",
+      strokeWidth: "2",
+      stroke: "#ffa726"
+    }
+  };
+
+  /**
+   * FUNCTIONS HOME -------------------------------------------------||>
+   **/
+
+  // 02 - HANDLE REFRESH TOKEN ACCESS -------------------------------||>
   const handleRefresh = useCallback(async () => {
     console.log('CEKAUTH: ', form?.provider);
     try {
@@ -408,6 +947,7 @@ const Home = ({navigation}) => {
     }
   }, [form]);
 
+  // 03 - HANDLE REVOKE TOKEN ACCESS -------------------------------||>
   const handleRevoke = useCallback(async () => {
     try {
       const config = configs[form.provider];
@@ -429,10 +969,16 @@ const Home = ({navigation}) => {
     }
   }, [form]);
 
+  // STARTER FUNCTION ON LOAD --------------------------------------||>
+  useEffect(() => {
+    loadAuthorize();
+  }, []);
+
   return (
     <SafeAreaView>
       <View>
-        {console.info('getform: ', form)}
+        {/* {console.info(JSON.stringify(form, null, ' '))} */}
+        {/* {console.info(JSON.stringify(gabungArray(), null, ' '))} */}
         <ScrollView>
             {/* SECTION #1: Logo & Versi */}
             <View
@@ -656,6 +1202,77 @@ const Home = ({navigation}) => {
                     style={{width: 60, height: 60, marginRight: 20, marginBottom: 10, marginTop: -10 }}
                   />
                 </View>
+              </View>
+            </View>
+
+            <View
+              style={{ backgroundColor: '#fff', shadowColor: '#000', marginLeft: 13, marginTop: 15, marginRight: 13, borderRadius: 5, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.2, elevation: 1,  }}
+            >
+              <View style={{ backgroundColor: '#ffffff' }}>
+              {/* <BarChart 
+                style={{
+                  marginLeft: 10,
+                  marginTop: 25,
+                }}
+                data={data}
+                formatYLabel = {(label) => {
+                  const labelVal = Number(label);
+                  if(labelVal >=40) return 'DEEP';
+                  if(labelVal >=30) return '';
+                  if(labelVal >=20) return 'LIGHT';
+                  if(labelVal >=10) return 'REM';
+                  if(labelVal >=0) return 'AWAKE';
+                  return label;
+                }}
+                width={300}
+                height={300} 
+                chartConfig={{ 
+                  backgroundGradientTo: 0,
+                  backgroundGradientFromOpacity: 0,
+                  backgroundGradientFrom: 0,
+                  backgroundGradientToOpacity: 0,
+                  color: () => `#23204f`,
+                  barPercentage: 0.23,
+                  barRadius : 0,
+                  decimalPlaces: 0,
+                  formatYLabel: () => yLabelIterator.next().value,
+                }}
+              withHorizontalLabels={true}
+              fromZero={true}
+              withCustomBarColorFromData={true}
+              flatColor={true}
+              withInnerLines={true}
+              showBarTops={false}
+              showValuesOnTopOfBars={false}
+              /> */}
+              {/* <BarChart 
+                style={{ height: 200, width: '100%' }} 
+                data={dataNewBar} 
+                svg={{ fill }} 
+                contentInset={{ top: 30, bottom: 30 
+              }}>
+                  <Grid />
+              </BarChart> */}
+              <BarChart
+              withHorizontalLabels={true}
+                style={{ height: 200, marginLeft: 30, marginRight: 30, marginTop: 20 }}
+                data={dataNewBar2}
+                gridMin={0}
+                svg={{ fill: 'rgba(134, 65, 244, 0.8)' }}
+                yAccessor={({ item }) => item.value}
+                contentInset={{ top: 20, bottom: 20 }}
+                horizontal={false}
+              >
+                  <Grid/>
+              </BarChart>
+
+            <YAxis
+                style={{ marginTop: 10 }}
+                data={ dataNewBar2 }
+                svg={{fontSize:10,fill:"grey"}}
+                formatLabel={ (value, index) => index }
+                labelStyle={ { color: 'black' } }
+            />
               </View>
             </View>
 
