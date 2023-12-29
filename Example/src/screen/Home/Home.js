@@ -15,13 +15,14 @@ import {
 
 import logoPamaKecil from '../../../assets/logo_pama_kecil.png';
 import logoOpa from '.../../../assets/logo_opa_dashboard_hijau.png';
-import sleep_moon from '../../../assets/sleep.png';
+import sleep_moon from '../../../assets/night.png';
 import heart_rate from '../../../assets/heart_rate.png';
 import pama_transparan_logo from '../../../assets/pama_transparan.png';
 import oksigen from '../../../assets/o2.png';
 import spo2 from '../../../assets/spo2.png';
 import profile1 from '../../../assets/profile_1.png';
 import gdv_icon from '../../../assets/gdv_icon_tp.png';
+import { parseJSON } from 'date-fns';
 
 const configs = {
   auth0: {
@@ -83,16 +84,6 @@ const Home = ({navigation}) => {
   });
 
   const removeData = async () => {
-    setDataDevice({
-      battery: '',
-      batteryLevel: 0,
-      deviceVersion: '',
-      id: '',
-      lastSyncTime: '',
-      mac: '',
-      type: ''
-    });
-
     await AsyncStorage.clear();
     navigation.navigate('Splash');
   };
@@ -268,6 +259,7 @@ const Home = ({navigation}) => {
               id_user_fitbit: parsingDataProfileFitBit?.user?.encodedId,
               token_access_fitbit: token_access?.tknAccess,
               refresh_token_fitbit: token_access?.tknRefresh,
+              expired_token_date: token_access?.tknExpired,
 
               display_name: parsingDataProfileFitBit?.user?.displayName,
               date_birth: parsingDataProfileFitBit?.user?.dateOfBirth,
@@ -333,9 +325,17 @@ const Home = ({navigation}) => {
 
   // 02 - HANDLE REFRESH TOKEN ACCESS -------------------------------||>
   const handleRefresh = useCallback(async () => {
+    setForm({
+      hasLoggedInOnce: false,
+      provider: '',
+      accessToken: '',
+      accessTokenExpirationDate: '',
+      refreshToken: '',
+    });
+
     console.log('HANDLE REFRESH : ', form?.provider);
     try {
-      const config = configs[form?.provsider];
+      const config = configs[form?.provider];
       const newAuthState = await refresh(config, {
         refreshToken: form?.refreshToken,
       });
@@ -347,11 +347,12 @@ const Home = ({navigation}) => {
       }));
 
       try {
-        const jsonValue = JSON.stringify(form);
+        const jsonValue = JSON.stringify(newAuthState);
         await AsyncStorage.setItem('LOGING-FITBIT', jsonValue);
         navigation.navigate('Splash');
       } catch (e) {
         console.log('AUTORIZE-SAFE-RESPONSE-CATCH: ', e.message);
+        Alert.alert('Failed to refresh token', e.message);
       }
       
     } catch (error) {
@@ -437,6 +438,7 @@ const Home = ({navigation}) => {
                     <Text style={{ color: '#ffde26', fontWeight: 'bold', textAlign: 'center' }}>ID User FitBit: {dataProfile?.id_user_fitbit === '' ? 'Initiating...' : dataProfile?.id_user_fitbit}</Text>
                     <Text style={{ color: '#ffde26', fontWeight: 'bold', textAlign: 'center' }}>Device: {dataDevice?.deviceVersion === '' ? 'Initiating...' : dataDevice?.deviceVersion + ' (' + dataDevice?.batteryLevel + '% ' + dataDevice?.battery + ')' + ' ~ ' + dataDevice?.mac}</Text>
                     <Text style={{ color: '#ffde26', fontWeight: 'bold', textAlign: 'center' }}>Last Sync: {convertTime(dataDevice?.lastSyncTime)}</Text>
+                    <Text style={{ color: '#ffde26', fontWeight: 'bold', textAlign: 'center' }}>Expired Session: {dataProfile?.expired_token_date === undefined ? 'Initiating...' : dataProfile?.expired_token_date}</Text>
                   </View>
                 </View>
               </View>
@@ -505,14 +507,14 @@ const Home = ({navigation}) => {
                       style={{ flex: 1, height: 50, alignItems: 'center', justifyContent: 'center' }}
                     >
                       <Text style={{ color: '#fff' }}>Mulai Tidur</Text>
-                      <Text style={{ color: '#fff' }}>23:00</Text>
+                      <Text style={{ color: '#fff' }}>Undefined</Text>
                     </View>
                     <View style={{ width: 2, backgroundColor: '#fff', marginTop: 5, marginBottom: 5 }} />
                     <View
                       style={{ flex: 1, height: 50, alignItems: 'center', justifyContent: 'center' }}
                     >
                       <Text style={{ color: '#fff' }}>Bangun Tidur</Text>
-                      <Text style={{ color: '#fff' }}>05:40</Text>
+                      <Text style={{ color: '#fff' }}>Undefined</Text>
                     </View>
                   </View>
                 </View>
@@ -568,7 +570,7 @@ const Home = ({navigation}) => {
                 style={{ justifyContent: 'center', alignItems: 'center', marginBottom: 50, marginTop: 80 }}
               >
                 <Image
-                  source={pama_transparan_logo}
+                  source={gdv_icon}
                   style={{width: 80, height: 90, marginBottom: 10 }}
                 />
               </View>

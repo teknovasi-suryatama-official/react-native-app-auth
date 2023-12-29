@@ -10,7 +10,7 @@ const Splash = ({ navigation }) => {
   const setGlobalData = async () => {
     const accessToken = await AsyncStorage.getItem('LOGING-FITBIT');
     const parseToJSON = JSON.parse(accessToken);
-    // console.info('CHECK LOGIN: ');
+    // console.info('SPLASH: ');
     // console.log(JSON.stringify(parseToJSON, null, ' '));
 
     setTimeout(() => {
