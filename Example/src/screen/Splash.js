@@ -28,7 +28,7 @@ const Splash = ({ navigation }) => {
 
   return (
     <View style={{ backgroundColor: '#1d2463', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-      <Text style={{ color: '#fff', fontSize: 20, fontFamily: 'Helvetica' }}>Goodeva Hub</Text>
+      <Text style={{ color: '#fff', fontSize: 30, fontFamily: 'Helvetica' }}>P.O.C</Text>
     </View>
   )
 }
