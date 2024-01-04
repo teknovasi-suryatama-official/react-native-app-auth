@@ -23,9 +23,9 @@ const configs = {
   auth0: {
     issuer: 'https://accounts.fitbit.com/login',
 
-    clientId: '23RFP5',
-    clientSecret: '3c72a622ee8c73cc24caa063fdf3567f',
-    redirectUrl: 'com.goodeva.hub://oauthredirect',
+    clientId: '23RQR8',
+    clientSecret: '10b1f3fd2c4f00272e324c9faac882ef',
+    redirectUrl: 'com.goodeva.smartsafety://oauthredirect',
     scopes: [
       'activity',
       'heartrate',

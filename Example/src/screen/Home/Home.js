@@ -30,7 +30,7 @@ const configs = {
 
     clientId: '23RQR8',
     clientSecret: '10b1f3fd2c4f00272e324c9faac882ef',
-    redirectUrl: 'com.goodeva.hub://oauthredirect',
+    redirectUrl: 'com.goodeva.smartsafety://oauthredirect',
     scopes: [
       'activity',
       'heartrate',
