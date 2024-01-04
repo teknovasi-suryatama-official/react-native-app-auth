@@ -1,4 +1,4 @@
-import { Alert, Dimensions, Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Alert, Dimensions, Image, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -28,8 +28,8 @@ const configs = {
   auth0: {
     issuer: 'https://accounts.fitbit.com/login',
 
-    clientId: '23RFP5',
-    clientSecret: '3c72a622ee8c73cc24caa063fdf3567f',
+    clientId: '23RQR8',
+    clientSecret: '10b1f3fd2c4f00272e324c9faac882ef',
     redirectUrl: 'com.goodeva.hub://oauthredirect',
     scopes: [
       'activity',
@@ -59,6 +59,7 @@ const Home = ({navigation}) => {
   const [loadingMessage, setLoadingMessage] = useState('Harap tunggu beberapa saat...');
 
   const [dataProfile, setDataProfile] = useState('');
+  const [loop, setLoop] = useState(0);
 
   const [dateTodayYd, setDateTodayYd] = useState({
     dateToday: '',
@@ -100,6 +101,43 @@ const Home = ({navigation}) => {
     return date + ' WIB';
   };
 
+  const getDataDashboard = async (id_user, date_get) => { 
+    const reqoptUser = { 
+      method: 'POST', 
+      headers: 
+      { 
+        'Content-Type': 'application/json' 
+      }, 
+      body: JSON.stringify(
+        { 
+          date: date_get,
+          id_user_fitbit: id_user,
+        }
+      ) 
+  }; 
+
+  try { 
+      await fetch( 
+          'https://dev4.goodeva.gss-login.com/api/get-sleep-user-fitbit', reqoptUser) 
+          .then(response => { 
+              response.json() 
+                  .then(data => { 
+                      setDataProfile(current =>  ({
+                        ...current,
+                        total_jam_tidur_td: data?.sleep_data?.total_jam,
+                        total_menit_tidur_td: data?.sleep_data?.total_menit,
+
+                        mulai_tidur_td: data?.sleep_data?.start_sleep,
+                        selesai_tidur_td: data?.sleep_data?.stop_sleep
+                      }));
+                  }); 
+          }) 
+  } 
+  catch (error) { 
+      console.error(error); 
+  } 
+};
+
   const requestUpdateData = async (data_for_update) => { 
         const reqoptUser = { 
           method: 'POST', 
@@ -122,10 +160,9 @@ const Home = ({navigation}) => {
           ) 
       }; 
 
-      try { 
-          const baseURL = GoodevaServer?.getGoodevaServer()?.baseurl;
+      try {
           await fetch( 
-              baseURL + 'update-user-fitbit', reqoptUser) 
+              'https://dev4.goodeva.gss-login.com/api/update-user-fitbit', reqoptUser) 
               .then(response => { 
                   response.json() 
                       .then(data => { 
@@ -137,8 +174,36 @@ const Home = ({navigation}) => {
                             mac_address_device: data?.data_user_fitbit?.mac_address_fitbit,
                           }));
                           
-                          setTimeout(() => {
+                          setTimeout(async () => {
                             setIsLoading(false);
+
+                            const dataDeviceFitBit = await AsyncStorage.getItem('GET_DATA_DEVICE_BY_FITBIT');
+                            console.log('DATA_DEVICE');
+                            console.info(JSON.stringify(dataDeviceFitBit, null, ' '))
+
+                            if (dataDeviceFitBit === null) {
+
+                              getDataDevice(dataProfile?.id_user_fitbit, dataProfile?.token_access_fitbit);
+
+                              const checkOtorisasi = await AsyncStorage.getItem('LOGING-FITBIT');
+                              const parseToJSON = JSON.parse(checkOtorisasi);
+                          
+                              const getTokenAccess = parseToJSON?.accessToken;
+                              const getRefreshToken = parseToJSON?.refreshToken;
+                              const getAccessTokenExpired = parseToJSON?.accessTokenExpirationDate;
+                              const idUserFitBit = parseToJSON?.tokenAdditionalParameters?.user_id;
+                              const getTokenType = parseToJSON?.tokenType;
+                          
+                              const dataArray = {
+                                tknAccess: getTokenAccess,
+                                tknRefresh: getRefreshToken,
+                                tknExpired: getAccessTokenExpired,
+                                usrID: idUserFitBit,
+                                tknType: getTokenType
+                              }
+
+                              loadingMessageTimlaps(dataArray);
+                            }
                           }, 1500);
                       }); 
               }) 
@@ -149,9 +214,9 @@ const Home = ({navigation}) => {
   };
 
   const getDataDevice = (id_user, token) => {
+    console.info('cekTOKEN: ', token);
     try {
-      const baseURL = FitBitServer?.getFitBitServer()?.baseurl;
-      fetch(baseURL  + '1/user/' + id_user + '/devices.json', {
+      fetch('https://api.fitbit.com/1/user/' + id_user + '/devices.json', {
         method: "GET",
         headers: {
           "Authorization": "Bearer " + token}
@@ -160,7 +225,7 @@ const Home = ({navigation}) => {
       .then(async json => 
         {
           try {
-
+            console.info('cekdata: ', json)
             for (let i = 0; i < json.length; i++) {
               if (json[i]?.deviceVersion !== 'MobileTrack') {
                 const jsonValue = JSON.stringify(json[i]);
@@ -189,8 +254,7 @@ const Home = ({navigation}) => {
 
   const requestDataAccountFitBit = (token) => {
     try {
-      const baseURL = FitBitServer?.getFitBitServer()?.baseurl;
-      fetch(baseURL  + '/1/user/-/profile.json', {
+      fetch('https://api.fitbit.com/1/user/-/profile.json', {
         method: "GET",
         headers: {
           "Authorization": "Bearer " + token}
@@ -214,11 +278,14 @@ const Home = ({navigation}) => {
   const loadingMessageTimlaps = (token_access) => {
     // STEP 1
     setTimeout(async () => {
+      console.log('1');
       setLoadingMessage('Konfigurasi data penyimpanan lokal...');
 
       // STEP 2
       setTimeout(async () => {
+        console.log('2');
         const dataProfileFitBit = await AsyncStorage.getItem('GET_DATA_PROFILE_FITBIT');
+
         if (dataProfileFitBit === null || dataProfileFitBit === undefined) {
     
           console.log('Data tidak ada, request ulang, dan sedang mencoba lagi...');
@@ -230,9 +297,26 @@ const Home = ({navigation}) => {
   
           if (parsingDataProfileFitBit?.errors) {
             console.info('Response error system, request ulang, dan sedang mencoba lagi...');
+
+            const checkOtorisasi = await AsyncStorage.getItem('LOGING-FITBIT');
+            const parseToJSON = JSON.parse(checkOtorisasi);
+        
+            const getTokenAccess = parseToJSON?.accessToken;
+            const getRefreshToken = parseToJSON?.refreshToken;
+            const getAccessTokenExpired = parseToJSON?.accessTokenExpirationDate;
+            const idUserFitBit = parseToJSON?.tokenAdditionalParameters?.user_id;
+            const getTokenType = parseToJSON?.tokenType;
+        
+            const dataArray = {
+              tknAccess: getTokenAccess,
+              tknRefresh: getRefreshToken,
+              tknExpired: getAccessTokenExpired,
+              usrID: idUserFitBit,
+              tknType: getTokenType
+            }
   
-            requestDataAccountFitBit(token_access?.tknAccess);
-            loadingMessageTimlaps(token_access?.tknAccess);
+            requestDataAccountFitBit(getTokenAccess);
+            loadingMessageTimlaps(dataArray);
           } else {
             console.info('Data already exist');
             setLoadingMessage('Penyiapan data Akun Anda...');
@@ -240,20 +324,10 @@ const Home = ({navigation}) => {
             const dataDeviceByFitBit = await AsyncStorage.getItem('GET_DATA_DEVICE_BY_FITBIT');
             const parseToJSON = JSON.parse(dataDeviceByFitBit);
 
-            if (dataDeviceByFitBit === null || dataDeviceByFitBit === undefined) {
-              getDataDevice(parsingDataProfileFitBit?.user?.encodedId, token_access?.tknAccess);
-            } else {
-              console.log('Data device by fitbit tersedia');
-              setDataDevice({
-                battery: parseToJSON?.battery,
-                batteryLevel: parseToJSON?.batteryLevel,
-                deviceVersion: parseToJSON?.deviceVersion,
-                id: parseToJSON?.id,
-                lastSyncTime: parseToJSON?.lastSyncTime,
-                mac: parseToJSON?.mac,
-                type: parseToJSON?.type
-              });
-            }
+            const todayDate = moment().format('yyyy-MM-DD');
+            getDataDashboard(parsingDataProfileFitBit?.user?.encodedId, todayDate);
+
+            getDataDevice(parsingDataProfileFitBit?.user?.encodedId, token_access?.tknAccess);
 
             const dataArrayProfileFitBit = {
               id_user_fitbit: parsingDataProfileFitBit?.user?.encodedId,
@@ -356,7 +430,10 @@ const Home = ({navigation}) => {
       }
       
     } catch (error) {
-      Alert.alert('Failed to refresh token', error.message);
+      // Alert.alert('Failed to refresh token', error.message);
+      Alert.alert('Gagal Memproses!!!!', 'Akun Anda diakses di device yang lain! lakukan prosedur revoke access dengan mengkonfirmasi tombol dibawah ini.', [
+        {text: 'Revoke Access', onPress: () => handleRevoke()},
+      ])
     }
   }, [form]);
 
@@ -378,7 +455,10 @@ const Home = ({navigation}) => {
 
       removeData();
     } catch (error) {
-      Alert.alert('Failed to revoke token', error.message);
+      // Alert.alert('Failed to revoke token', error.message);
+      Alert.alert('Gagal Memproses!!!!', 'Akun Anda diakses di device yang lain! lakukan prosedur revoke access dengan mengkonfirmasi tombol dibawah ini.', [
+        {text: 'Revoke Access', onPress: () => handleRevoke()},
+      ])
     }
   }, [form]);
 
@@ -437,7 +517,7 @@ const Home = ({navigation}) => {
                     <Text style={{ color: '#ffde26', fontWeight: 'bold', textAlign: 'center', marginTop: 10 }}>Email: {dataProfile?.email_account === undefined ? 'Initiating...' : dataProfile?.email_account}</Text>
                     <Text style={{ color: '#ffde26', fontWeight: 'bold', textAlign: 'center' }}>ID User FitBit: {dataProfile?.id_user_fitbit === '' ? 'Initiating...' : dataProfile?.id_user_fitbit}</Text>
                     <Text style={{ color: '#ffde26', fontWeight: 'bold', textAlign: 'center' }}>Device: {dataDevice?.deviceVersion === '' ? 'Initiating...' : dataDevice?.deviceVersion + ' (' + dataDevice?.batteryLevel + '% ' + dataDevice?.battery + ')' + ' ~ ' + dataDevice?.mac}</Text>
-                    <Text style={{ color: '#ffde26', fontWeight: 'bold', textAlign: 'center' }}>Last Sync: {convertTime(dataDevice?.lastSyncTime)}</Text>
+                    <Text style={{ color: '#ffde26', fontWeight: 'bold', textAlign: 'center' }}>Last Sync: {dataDevice?.lastSyncTime}</Text>
                     <Text style={{ color: '#ffde26', fontWeight: 'bold', textAlign: 'center' }}>Expired Session: {dataProfile?.expired_token_date === undefined ? 'Initiating...' : dataProfile?.expired_token_date}</Text>
                   </View>
                 </View>
@@ -468,7 +548,7 @@ const Home = ({navigation}) => {
                     <View
                       style={{ flexDirection: 'row' }}
                     >
-                      <Text style={{ color: '#133337', fontWeight: 'bold', fontSize: 70 }}>0</Text>
+                      <Text style={{ color: '#133337', fontWeight: 'bold', fontSize: 70 }}>{dataProfile?.total_jam_tidur_td}</Text>
                       <View
                         style={{ justifyContent: 'center' }}
                       >
@@ -478,7 +558,7 @@ const Home = ({navigation}) => {
                     <View
                       style={{ flexDirection: 'row', marginLeft: 10 }}
                     >
-                      <Text style={{ color: '#133337', fontWeight: 'bold', fontSize: 70 }}>0</Text>
+                      <Text style={{ color: '#133337', fontWeight: 'bold', fontSize: 70 }}>{dataProfile?.total_menit_tidur_td}</Text>
                       <View
                         style={{ justifyContent: 'center' }}
                       >
@@ -507,14 +587,14 @@ const Home = ({navigation}) => {
                       style={{ flex: 1, height: 50, alignItems: 'center', justifyContent: 'center' }}
                     >
                       <Text style={{ color: '#fff' }}>Mulai Tidur</Text>
-                      <Text style={{ color: '#fff' }}>Undefined</Text>
+                      <Text style={{ color: '#fff' }}>{dataProfile?.mulai_tidur_td}</Text>
                     </View>
                     <View style={{ width: 2, backgroundColor: '#fff', marginTop: 5, marginBottom: 5 }} />
                     <View
                       style={{ flex: 1, height: 50, alignItems: 'center', justifyContent: 'center' }}
                     >
                       <Text style={{ color: '#fff' }}>Bangun Tidur</Text>
-                      <Text style={{ color: '#fff' }}>Undefined</Text>
+                      <Text style={{ color: '#fff' }}>{dataProfile?.selesai_tidur_td}</Text>
                     </View>
                   </View>
                 </View>
