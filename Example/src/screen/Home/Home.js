@@ -1,28 +1,18 @@
-import { Alert, Dimensions, Image, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Alert, Image, Pressable, ScrollView, Text, View } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BarChart, Grid, XAxis } from 'react-native-svg-charts';
-import moment from 'moment';
 
-import FitBitServer from '../../../servers/FitBitServer';
-import GoodevaServer from '../../../servers/GoodevaServer';
+import moment from 'moment';
 
 import {
   refresh,
   revoke,
 } from 'react-native-app-auth';
 
-import logoPamaKecil from '../../../assets/logo_pama_kecil.png';
-import logoOpa from '.../../../assets/logo_opa_dashboard_hijau.png';
 import sleep_moon from '../../../assets/night.png';
-import heart_rate from '../../../assets/heart_rate.png';
-import pama_transparan_logo from '../../../assets/pama_transparan.png';
-import oksigen from '../../../assets/o2.png';
-import spo2 from '../../../assets/spo2.png';
 import profile1 from '../../../assets/profile_1.png';
 import gdv_icon from '../../../assets/gdv_icon_tp.png';
-import { parseJSON } from 'date-fns';
 
 const configs = {
   auth0: {
@@ -59,7 +49,6 @@ const Home = ({navigation}) => {
   const [loadingMessage, setLoadingMessage] = useState('Harap tunggu beberapa saat...');
 
   const [dataProfile, setDataProfile] = useState('');
-  const [loop, setLoop] = useState(0);
 
   const [dateTodayYd, setDateTodayYd] = useState({
     dateToday: '',
@@ -178,8 +167,6 @@ const Home = ({navigation}) => {
                             setIsLoading(false);
 
                             const dataDeviceFitBit = await AsyncStorage.getItem('GET_DATA_DEVICE_BY_FITBIT');
-                            console.log('DATA_DEVICE');
-                            console.info(JSON.stringify(dataDeviceFitBit, null, ' '))
 
                             if (dataDeviceFitBit === null) {
 
@@ -214,7 +201,6 @@ const Home = ({navigation}) => {
   };
 
   const getDataDevice = (id_user, token) => {
-    console.info('cekTOKEN: ', token);
     try {
       fetch('https://api.fitbit.com/1/user/' + id_user + '/devices.json', {
         method: "GET",
@@ -225,7 +211,6 @@ const Home = ({navigation}) => {
       .then(async json => 
         {
           try {
-            console.info('cekdata: ', json)
             for (let i = 0; i < json.length; i++) {
               if (json[i]?.deviceVersion !== 'MobileTrack') {
                 const jsonValue = JSON.stringify(json[i]);
@@ -470,7 +455,7 @@ const Home = ({navigation}) => {
   // CONTAIN --------------------------------------------------------||>
   const containHome = () => {
     return (
-      <View style={{ flex: 1, justifyContent: 'center' }}>
+      <SafeAreaView style={{ flex: 1, justifyContent: 'center' }}>
         <ScrollView>
               {/* SECTION #1: Logo & Versi */}
               <View
@@ -654,8 +639,13 @@ const Home = ({navigation}) => {
                   style={{width: 80, height: 90, marginBottom: 10 }}
                 />
               </View>
+
+              <View
+                style={{ marginLeft: 10 }}
+              >
+              </View>
         </ScrollView>
-      </View>
+      </SafeAreaView>
     )
   };
   
