@@ -1,5 +1,6 @@
 import { 
   Image, 
+  Pressable, 
   ScrollView, 
   Text, 
   View 
@@ -150,26 +151,32 @@ const Homepage = ({navigation}) => {
                 marginLeft: 10
               }}
             >
-              <View>
-                <View
-                  style={{ borderWidth: 1.5, padding: 5, borderRadius: 8, alignItems: 'center', backgroundColor: '#FFFFFF', marginLeft: 20, marginRight: 20, borderColor: '#9EA5BE' }}
-                >
-                  <Image 
-                    source={upload_ic}
-                    style={{ width: 35, height: 30 , marginTop: 10, marginBottom: 10}}
-                  />
+              <Pressable
+                onPress={() => {
+                  navigation.navigate('UploadPresence');
+                }}
+              >
+                <View>
+                  <View
+                    style={{ borderWidth: 1.5, padding: 5, borderRadius: 8, alignItems: 'center', backgroundColor: '#FFFFFF', marginLeft: 20, marginRight: 20, borderColor: '#9EA5BE' }}
+                  >
+                    <Image 
+                      source={upload_ic}
+                      style={{ width: 35, height: 30 , marginTop: 10, marginBottom: 10}}
+                    />
+                  </View>
+                  <Text
+                    style={{ 
+                      marginTop: 10,
+                      textAlign: 'center',
+                      fontWeight: '500',
+                      color: '#1D2E69', 
+                    }}
+                  >
+                    Upload
+                  </Text>
                 </View>
-                <Text
-                  style={{ 
-                    marginTop: 10,
-                    textAlign: 'center',
-                    fontWeight: '500',
-                    color: '#1D2E69', 
-                  }}
-                >
-                  Upload
-                </Text>
-              </View>
+              </Pressable>
             </View>
 
             {/* LEAVE */}
