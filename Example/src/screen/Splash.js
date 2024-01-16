@@ -17,7 +17,7 @@ const Splash = ({ navigation }) => {
       if (parseToJSON?.accessToken) {
         navigation.navigate('Home');
       } else {
-        navigation.navigate('Login');
+        navigation.navigate('Homepage');
       }
     }, 1500);
   };
@@ -28,7 +28,7 @@ const Splash = ({ navigation }) => {
 
   return (
     <View style={{ backgroundColor: '#1d2463', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-      <Text style={{ color: '#fff', fontSize: 30, fontFamily: 'Helvetica' }}>P.O.C</Text>
+      <Text style={{ color: '#fff', fontSize: 30, fontFamily: 'Helvetica' }}>Smartsafety</Text>
     </View>
   )
 }

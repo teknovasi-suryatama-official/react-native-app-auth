@@ -25,7 +25,7 @@
             <action android:name="android.intent.action.VIEW" />
             <category android:name="android.intent.category.DEFAULT" />
             <category android:name="android.intent.category.BROWSABLE" />
-            <data android:scheme="com.goodeva.hub" />
+            <data android:scheme="com.goodeva.smartsafety" />
             <data
               android:scheme="http"
               android:host="localhost" />

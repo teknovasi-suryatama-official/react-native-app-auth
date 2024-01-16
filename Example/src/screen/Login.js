@@ -23,9 +23,9 @@ const configs = {
   auth0: {
     issuer: 'https://accounts.fitbit.com/login',
 
-    clientId: '23RFP5',
-    clientSecret: '3c72a622ee8c73cc24caa063fdf3567f',
-    redirectUrl: 'com.goodeva.hub://oauthredirect',
+    clientId: '23RQR8',
+    clientSecret: '10b1f3fd2c4f00272e324c9faac882ef',
+    redirectUrl: 'com.goodeva.smartsafety://oauthredirect',
     scopes: [
       'activity',
       'heartrate',
@@ -84,6 +84,10 @@ const Login = ({navigation}) => {
     handleAuthorize('auth0');
   };
 
+  const goToHome = () => {
+    navigation.navigate('Homepage');
+  };
+
   const showContentHasNoAccess = () => {
     return (
       <>
@@ -111,6 +115,12 @@ const Login = ({navigation}) => {
               onPress={actionOAuth}
             >
               <Text style={styles.textButtonLight}>Signin with Google</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.buttonPrimary, { backgroundColor: '#3246a8', marginTop: 10 }]} 
+              onPress={goToHome}
+            >
+              <Text style={styles.textButtonLight}>Go To Home</Text>
             </TouchableOpacity>
             <Text
               style={{ textAlign: 'center', marginBottom: 0, fontSize: 15, marginTop: 210, color: '#968388' }}

@@ -5,6 +5,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from './src/screen/Login';
 import Splash from './src/screen/Splash';
+import Homepage from './src/screen/Smartsafety/Homepage';
+import Upload from './src/screen/Smartsafety/Upload';
 
 const App = () => {
 
@@ -26,6 +28,16 @@ const App = () => {
         <Stack.Screen 
           name="Home" 
           component={Home} 
+          options={{headerShown: false}}
+        />
+        <Stack.Screen 
+          name="Homepage" 
+          component={Homepage} 
+          options={{headerShown: false}}
+        />
+        <Stack.Screen 
+          name="UploadPresence" 
+          component={Upload} 
           options={{headerShown: false}}
         />
       </Stack.Navigator>
